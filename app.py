@@ -3,6 +3,7 @@ import streamlit as st
 st.title("Prompt Debugger (Test Mode)")
 
 st.write("This is a test version of the app. No OpenAI API calls are made.")
+st.write("This is a test of auto-redeploy on code push")
 
 prompt1 = st.text_area("Prompt A", height=150)
 prompt2 = st.text_area("Prompt B", height=150)
