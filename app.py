@@ -1,17 +1,31 @@
 import streamlit as st
+from core import run_prompt, token_info, compare_outputs
 
-st.title("Prompt Debugger (Test Mode)")
+st.title("Prompt Debugger")
 
-st.write("This is a test version of the app. No OpenAI API calls are made.")
-st.write("This is a test of auto-redeploy on code push")
-
+model = "gpt-3.5-turbo"
 prompt1 = st.text_area("Prompt A", height=150)
 prompt2 = st.text_area("Prompt B", height=150)
 
 if st.button("Compare Prompts"):
+    with st.spinner("Running prompts..."):
+        out1 = run_prompt(prompt1, model)
+        out2 = run_prompt(prompt2, model)
+        diff = compare_outputs(out1, out2)
+        t1, c1 = token_info(prompt1, model)
+        t2, c2 = token_info(prompt2, model)
+
     st.subheader("Output")
-    st.write("**Prompt A Output:** This is a fake response for Prompt A.")
-    st.write("**Prompt B Output:** This is a fake response for Prompt B.")
+    st.write("**Prompt A Output:**")
+    st.code(out1)
+    st.write("**Prompt B Output:**")
+    st.code(out2)
+
     st.subheader("Diff")
-    st.code("Sample diff:\n- Old line\n+ New line")
-    st.markdown("**Token Count (est.):** 23  \n**Estimated Cost:** $0.00")
+    st.code(diff if diff else "No differences found.")
+
+    st.subheader("Token & Cost Info")
+    st.markdown(f"""
+    - Prompt A: {t1} tokens (${c1:.4f})  
+    - Prompt B: {t2} tokens (${c2:.4f})
+    """)
