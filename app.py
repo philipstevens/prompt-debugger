@@ -1,13 +1,28 @@
 import streamlit as st
 from core import create_client, run_prompt, token_info, compare_outputs
 
+st.set_page_config(page_title="Prompt Debugger", page_icon="🛠️")
+
 st.title("Prompt Debugger")
 
-# API Key Input with Session State
+# API Key Input with Session State in Sidebar
 if "api_key" not in st.session_state:
     st.session_state.api_key = ""
 
-st.text_input("Enter your OpenAI API Key", type="password", key="api_key")
+with st.sidebar.expander("🔑 API Key (required to run)", expanded=True):
+    st.text_input("Enter your OpenAI API Key", type="password", key="api_key")
+
+# Live Key Status Indicator in Sidebar
+if st.session_state.api_key:
+    st.sidebar.success("✅ API Key loaded. Ready to run prompts.")
+else:
+    st.sidebar.warning("🔑 API Key required to run prompts.")
+
+# Block App If API Key Is Missing
+if not st.session_state.api_key:
+    st.title("🔑 Enter Your OpenAI API Key to Start")
+    st.text_input("API Key", type="password", key="api_key")
+    st.stop()
 
 model = "gpt-3.5-turbo"
 
@@ -15,10 +30,12 @@ model = "gpt-3.5-turbo"
 example_prompt1 = "Explain the concept of gravity to a 10-year-old."
 example_prompt2 = "Describe gravity using a short analogy."
 
+st.markdown("### Prompt Configuration")
 prompt1 = st.text_area("Prompt A", value=example_prompt1, height=150)
 prompt2 = st.text_area("Prompt B", value=example_prompt2, height=150)
 
 # Additional user controls
+st.markdown("### Advanced Settings")
 max_tokens = st.slider("Max Tokens (response length)", min_value=1, max_value=1000, value=50)
 temperature = st.slider("Temperature (creativity/randomness)", min_value=0.0, max_value=1.0, value=0.0, step=0.05)
 
