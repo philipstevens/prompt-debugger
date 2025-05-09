@@ -7,13 +7,18 @@ model = "gpt-3.5-turbo"
 prompt1 = st.text_area("Prompt A", height=150)
 prompt2 = st.text_area("Prompt B", height=150)
 
+api_key = st.text_input("Enter your OpenAI API Key", type="password")
+
 if st.button("Compare Prompts"):
-    with st.spinner("Running prompts..."):
-        out1 = run_prompt(prompt1, model)
-        out2 = run_prompt(prompt2, model)
-        diff = compare_outputs(out1, out2)
-        t1, c1 = token_info(prompt1, model)
-        t2, c2 = token_info(prompt2, model)
+    if not api_key:
+        st.error("Please enter your OpenAI API Key.")
+    else:
+        with st.spinner("Running prompts..."):
+            out1 = run_prompt(prompt1, model)
+            out2 = run_prompt(prompt2, model)
+            diff = compare_outputs(out1, out2)
+            t1, c1 = token_info(prompt1, model)
+            t2, c2 = token_info(prompt2, model)
 
     st.subheader("Output")
     st.write("**Prompt A Output:**")
