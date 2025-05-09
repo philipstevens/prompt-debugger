@@ -19,7 +19,7 @@ if not st.session_state.key_confirmed:
         if st.session_state.api_key_temp:
             st.session_state.api_key = st.session_state.api_key_temp
             st.session_state.key_confirmed = True
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.warning("Please enter your OpenAI API Key.")
     st.stop()
@@ -31,7 +31,7 @@ with st.sidebar.expander("⚙️ Manage API Key", expanded=False):
         if new_key:
             st.session_state.api_key = new_key
             st.success("API Key updated successfully.")
-            st.experimental_rerun()
+            st.rerun()
 
 model = "gpt-3.5-turbo"
 
