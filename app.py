@@ -5,24 +5,33 @@ st.set_page_config(page_title="Prompt Debugger", page_icon="🛠️")
 
 st.title("Prompt Debugger")
 
-# API Key Input with Session State in Sidebar
+# API Key Management with Clean Startup UX
 if "api_key" not in st.session_state:
     st.session_state.api_key = ""
+if "key_confirmed" not in st.session_state:
+    st.session_state.key_confirmed = False
 
-with st.sidebar.expander("🔑 API Key (required to run)", expanded=True):
-    st.text_input("Enter your OpenAI API Key", type="password", key="api_key")
-
-# Live Key Status Indicator in Sidebar
-if st.session_state.api_key:
-    st.sidebar.success("✅ API Key loaded. Ready to run prompts.")
-else:
-    st.sidebar.warning("🔑 API Key required to run prompts.")
-
-# Block App If API Key Is Missing
-if not st.session_state.api_key:
-    st.title("🔑 Enter Your OpenAI API Key to Start")
-    st.text_input("API Key", type="password", key="api_key")
+# Show Key Input If Not Confirmed Yet (Clean Splash)
+if not st.session_state.key_confirmed:
+    st.markdown("### 🔑 Enter Your OpenAI API Key to Start")
+    st.text_input("API Key", type="password", key="api_key_temp")
+    if st.button("Continue"):
+        if st.session_state.api_key_temp:
+            st.session_state.api_key = st.session_state.api_key_temp
+            st.session_state.key_confirmed = True
+            st.experimental_rerun()
+        else:
+            st.warning("Please enter your OpenAI API Key.")
     st.stop()
+
+# Optional API Key Management in Sidebar
+with st.sidebar.expander("⚙️ Manage API Key", expanded=False):
+    new_key = st.text_input("Update API Key", type="password")
+    if st.button("Update Key"):
+        if new_key:
+            st.session_state.api_key = new_key
+            st.success("API Key updated successfully.")
+            st.experimental_rerun()
 
 model = "gpt-3.5-turbo"
 
@@ -40,28 +49,25 @@ max_tokens = st.slider("Max Tokens (response length)", min_value=1, max_value=10
 temperature = st.slider("Temperature (creativity/randomness)", min_value=0.0, max_value=1.0, value=0.0, step=0.05)
 
 if st.button("Compare Prompts"):
-    if not st.session_state.api_key:
-        st.error("Please enter your OpenAI API Key.")
-    else:
-        client = create_client(st.session_state.api_key)
-        with st.spinner("Running prompts..."):
-            # Run prompts and capture outputs with user-defined parameters
-            out1 = run_prompt(client, prompt1, model, max_tokens=max_tokens, temperature=temperature)
-            out2 = run_prompt(client, prompt2, model, max_tokens=max_tokens, temperature=temperature)
+    client = create_client(st.session_state.api_key)
+    with st.spinner("Running prompts..."):
+        # Run prompts and capture outputs with user-defined parameters
+        out1 = run_prompt(client, prompt1, model, max_tokens=max_tokens, temperature=temperature)
+        out2 = run_prompt(client, prompt2, model, max_tokens=max_tokens, temperature=temperature)
 
-            # Compare outputs
-            diff = compare_outputs(out1, out2)
+        # Compare outputs
+        diff = compare_outputs(out1, out2)
 
-            # Token and cost info for input and output separately
-            t1_input, c1_input = token_info(prompt1, model)
-            t1_output, c1_output = token_info(out1, model)
-            t1_total_tokens = t1_input + t1_output
-            c1_total_cost = c1_input + c1_output
+        # Token and cost info for input and output separately
+        t1_input, c1_input = token_info(prompt1, model)
+        t1_output, c1_output = token_info(out1, model)
+        t1_total_tokens = t1_input + t1_output
+        c1_total_cost = c1_input + c1_output
 
-            t2_input, c2_input = token_info(prompt2, model)
-            t2_output, c2_output = token_info(out2, model)
-            t2_total_tokens = t2_input + t2_output
-            c2_total_cost = c2_input + c2_output
+        t2_input, c2_input = token_info(prompt2, model)
+        t2_output, c2_output = token_info(out2, model)
+        t2_total_tokens = t2_input + t2_output
+        c2_total_cost = c2_input + c2_output
 
         # Show Outputs
         st.subheader("Output")
