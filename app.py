@@ -87,6 +87,7 @@ if st.button("Compare Prompts"):
 
 # Spacer and Divider before API Key Management
 st.markdown("---")
+st.markdown("<br><br>", unsafe_allow_html=True)
 st.markdown("### 🔒 API Key Management")
 with st.expander("⚙️ Manage API Key (click to expand)", expanded=False):
     new_key = st.text_input("Update API Key", type="password")
