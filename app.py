@@ -24,15 +24,6 @@ if not st.session_state.key_confirmed:
             st.warning("Please enter your OpenAI API Key.")
     st.stop()
 
-# Optional API Key Management in Sidebar
-with st.sidebar.expander("⚙️ Manage API Key", expanded=False):
-    new_key = st.text_input("Update API Key", type="password")
-    if st.button("Update Key"):
-        if new_key:
-            st.session_state.api_key = new_key
-            st.success("API Key updated successfully.")
-            st.rerun()
-
 model = "gpt-3.5-turbo"
 
 # Pre-filled example prompts
@@ -93,3 +84,12 @@ if st.button("Compare Prompts"):
         - Output: {t2_output} tokens (${c2_output:.4f})
         - Total: {t2_total_tokens} tokens (${c2_total_cost:.4f})
         """)
+
+# Optional API Key Management at the Bottom
+with st.expander("⚙️ Manage API Key (click to expand)", expanded=False):
+    new_key = st.text_input("Update API Key", type="password")
+    if st.button("Update API Key"):
+        if new_key:
+            st.session_state.api_key = new_key
+            st.success("API Key updated successfully.")
+            st.rerun()
