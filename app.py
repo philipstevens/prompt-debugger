@@ -1,36 +1,72 @@
 import streamlit as st
-from core import run_prompt, token_info, compare_outputs
+from core import create_client, run_prompt, token_info, compare_outputs
 
 st.title("Prompt Debugger")
 
-model = "gpt-3.5-turbo"
-prompt1 = st.text_area("Prompt A", height=150)
-prompt2 = st.text_area("Prompt B", height=150)
+# API Key Input with Session State
+if "api_key" not in st.session_state:
+    st.session_state.api_key = ""
 
-api_key = st.text_input("Enter your OpenAI API Key", type="password")
+st.text_input("Enter your OpenAI API Key", type="password", key="api_key")
+
+model = "gpt-3.5-turbo"
+
+# Pre-filled example prompts
+example_prompt1 = "Explain the concept of gravity to a 10-year-old."
+example_prompt2 = "Describe gravity using a short analogy."
+
+prompt1 = st.text_area("Prompt A", value=example_prompt1, height=150)
+prompt2 = st.text_area("Prompt B", value=example_prompt2, height=150)
+
+# Additional user controls
+max_tokens = st.slider("Max Tokens (response length)", min_value=1, max_value=1000, value=50)
+temperature = st.slider("Temperature (creativity/randomness)", min_value=0.0, max_value=1.0, value=0.0, step=0.05)
 
 if st.button("Compare Prompts"):
-    if not api_key:
+    if not st.session_state.api_key:
         st.error("Please enter your OpenAI API Key.")
     else:
+        client = create_client(st.session_state.api_key)
         with st.spinner("Running prompts..."):
-            out1 = run_prompt(prompt1, model)
-            out2 = run_prompt(prompt2, model)
+            # Run prompts and capture outputs with user-defined parameters
+            out1 = run_prompt(client, prompt1, model, max_tokens=max_tokens, temperature=temperature)
+            out2 = run_prompt(client, prompt2, model, max_tokens=max_tokens, temperature=temperature)
+
+            # Compare outputs
             diff = compare_outputs(out1, out2)
-            t1, c1 = token_info(prompt1, model)
-            t2, c2 = token_info(prompt2, model)
 
-    st.subheader("Output")
-    st.write("**Prompt A Output:**")
-    st.code(out1)
-    st.write("**Prompt B Output:**")
-    st.code(out2)
+            # Token and cost info for input and output separately
+            t1_input, c1_input = token_info(prompt1, model)
+            t1_output, c1_output = token_info(out1, model)
+            t1_total_tokens = t1_input + t1_output
+            c1_total_cost = c1_input + c1_output
 
-    st.subheader("Diff")
-    st.code(diff if diff else "No differences found.")
+            t2_input, c2_input = token_info(prompt2, model)
+            t2_output, c2_output = token_info(out2, model)
+            t2_total_tokens = t2_input + t2_output
+            c2_total_cost = c2_input + c2_output
 
-    st.subheader("Token & Cost Info")
-    st.markdown(f"""
-    - Prompt A: {t1} tokens (${c1:.4f})  
-    - Prompt B: {t2} tokens (${c2:.4f})
-    """)
+        # Show Outputs
+        st.subheader("Output")
+        st.write("**Prompt A Output:**")
+        st.code(out1)
+        st.write("**Prompt B Output:**")
+        st.code(out2)
+
+        # Show Diff
+        st.subheader("Diff")
+        st.code(diff if diff else "No differences found.")
+
+        # Show Token and Cost Breakdown
+        st.subheader("Token & Cost Info")
+        st.markdown(f"""
+        **Prompt A**
+        - Input: {t1_input} tokens (${c1_input:.4f})
+        - Output: {t1_output} tokens (${c1_output:.4f})
+        - Total: {t1_total_tokens} tokens (${c1_total_cost:.4f})
+
+        **Prompt B**
+        - Input: {t2_input} tokens (${c2_input:.4f})
+        - Output: {t2_output} tokens (${c2_output:.4f})
+        - Total: {t2_total_tokens} tokens (${c2_total_cost:.4f})
+        """)
