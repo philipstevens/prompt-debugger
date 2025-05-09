@@ -1,7 +1,7 @@
 import streamlit as st
 from core import create_client, run_prompt, token_info, compare_outputs
 
-st.set_page_config(page_title="Prompt Debugger", page_icon="🛠️")
+st.set_page_config(page_title="Prompt Debugger", page_icon="🛠️", layout="wide")
 
 st.title("Prompt Debugger")
 
