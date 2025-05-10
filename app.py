@@ -33,30 +33,29 @@ prompt1 = st.text_area("Prompt A", value=example_prompt1, height=150)
 prompt2 = st.text_area("Prompt B", value=example_prompt2, height=150)
 
 # Additional Controls
-st.markdown("### Advanced Settings")
-
-# Model Selection
-model_choice = st.selectbox(
-    "Model",
-    ["gpt-3.5-turbo (Faster, Cheaper)", "gpt-4-turbo (Higher Quality)", "gpt-4 (Highest Quality, Expensive)"],
-    index=0,
-    help="Choose the model used for running prompts and LLM similarity"
-)
+with st.expander("Advanced Settings"):
+    # Model Selection
+    model_choice = st.selectbox(
+        "Model",
+        ["gpt-3.5-turbo (Faster, Cheaper)", "gpt-4-turbo (Higher Quality)", "gpt-4 (Highest Quality, Expensive)"],
+        index=0,
+        help="Choose the model used for running prompts and LLM similarity"
+    )
+    
+    # Similarity Method
+    similarity_method = st.selectbox(
+        "Similarity Method",
+        ["tfidf (Free, Fast)", "embeddings (Low Cost, High Quality)", "llm (High Cost, Highest Quality)"],
+        index=0,
+        help="Choose how to compare output similarity"
+    )
+    
+    # Tokens/Temperature
+    max_tokens = st.slider("Max Tokens (response length)", min_value=1, max_value=1000, value=50)
+    temperature = st.slider("Temperature (creativity/randomness)", min_value=0.0, max_value=1.0, value=0.0, step=0.05)
+    
 model = model_choice.split()[0]  # 'gpt-3.5-turbo', 'gpt-4-turbo', or 'gpt-4'
-
-# Similarity Method
-similarity_method = st.selectbox(
-    "Similarity Method",
-    ["tfidf (Free, Fast)", "embeddings (Low Cost, High Quality)", "llm (High Cost, Highest Quality)"],
-    index=0,
-    help="Choose how to compare output similarity"
-)
 method_key = similarity_method.split()[0]  # 'tfidf', 'embeddings', or 'llm'
-
-# Tokens/Temperature
-max_tokens = st.slider("Max Tokens (response length)", min_value=1, max_value=1000, value=50)
-temperature = st.slider("Temperature (creativity/randomness)", min_value=0.0, max_value=1.0, value=0.0, step=0.05)
-
 
 if st.button("Compare Prompts"):
     client = create_client(st.session_state.api_key)
