@@ -24,16 +24,8 @@ if not st.session_state.key_confirmed:
             st.warning("Please enter your OpenAI API Key.")
     st.stop()
 
-# Pre-filled example prompts
-example_prompt1 = "Explain the concept of gravity to a 10-year-old."
-example_prompt2 = "Describe gravity using a short analogy."
-
-st.markdown("### Prompt Configuration")
-prompt1 = st.text_area("Prompt A", value=example_prompt1, height=150)
-prompt2 = st.text_area("Prompt B", value=example_prompt2, height=150)
-
 # Additional Controls
-with st.expander("Advanced Settings"):
+with st.expander("Settings"):
     # Model Selection
     model_choice = st.selectbox(
         "Model",
@@ -53,6 +45,13 @@ with st.expander("Advanced Settings"):
     # Tokens/Temperature
     max_tokens = st.slider("Max Tokens (response length)", min_value=1, max_value=1000, value=50)
     temperature = st.slider("Temperature (creativity/randomness)", min_value=0.0, max_value=1.0, value=0.0, step=0.05)
+    
+# Pre-filled example prompts
+example_prompt1 = "Explain the concept of gravity to a 10-year-old."
+example_prompt2 = "Describe gravity using a short analogy."
+
+prompt1 = st.text_area("Prompt A", value=example_prompt1, height=150)
+prompt2 = st.text_area("Prompt B", value=example_prompt2, height=150)
     
 model = model_choice.split()[0]  # 'gpt-3.5-turbo', 'gpt-4-turbo', or 'gpt-4'
 method_key = similarity_method.split()[0]  # 'tfidf', 'embeddings', or 'llm'
