@@ -71,8 +71,8 @@ if st.button("Compare Prompts"):
     
         # Show Similarity
         similarity_percentage, similarity_label = compare_text(out1, out2)
-        st.subheader("Output Similarity")
-        st.markdown(f"**Similarity:** {similarity_percentage}% ({similarity_label})")
+        st.subheader("Similarity")
+        st.markdown(f"{similarity_percentage}% ({similarity_label})")
         
         # Show Token and Cost Breakdown
         st.subheader("Token & Cost Info")
