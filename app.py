@@ -1,5 +1,5 @@
 import streamlit as st
-from core import create_client, run_prompt, token_info, compare_outputs
+from core import create_client, run_prompt, token_info, compare_text
 
 st.set_page_config(page_title="Prompt Debugger", page_icon="🛠️", layout="wide")
 
@@ -74,10 +74,9 @@ if st.button("Compare Prompts"):
     
 
         # Show Similarity
-        similarity = difflib.SequenceMatcher(None, out1, out2).ratio()
-        similarity_percentage = round(similarity * 100, 2)
-        st.subheader("Output Similarity Score")
-        st.markdown(f"**Similarity:** {similarity_percentage}%")
+        similarity_percentage, similarity_label = compare_text(out1, out2)
+        st.subheader("Output Similarity")
+        st.markdown(f"**Similarity:** {similarity_percentage}% ({similarity_label})")
         
         # Show Token and Cost Breakdown
         st.subheader("Token & Cost Info")
