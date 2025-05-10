@@ -30,6 +30,16 @@ def run_prompt(
     )
     return response.choices[0].message.content
 
+def format_scaled_cost(cost):
+    if cost < 0.001:
+        microdollars = cost * 1_000_000
+        return f"{microdollars:.0f} µ$"
+    elif cost < 0.01:
+        millidollars = cost * 1000
+        return f"{millidollars:.1f} m$"
+    else:
+        return f"${cost:.4f}"
+
 # Function: Token and cost calculation
 def token_info(text, model="gpt-3.5-turbo"):
     enc = tiktoken.encoding_for_model(model)
