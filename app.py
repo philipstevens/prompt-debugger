@@ -105,15 +105,3 @@ if st.button("Compare Prompts"):
         - Total: {t2_total_tokens} tokens (${c2_total_cost:.4f})
         """)
 
-# Spacer and Divider before API Key Management
-st.markdown("---")
-st.markdown("<br><br>", unsafe_allow_html=True)
-st.markdown("### 🔒 API Key Management")
-with st.expander("⚙️ Manage API Key (click to expand)", expanded=False):
-    new_key = st.text_input("Update API Key", type="password")
-    if st.button("Update API Key"):
-        if new_key:
-            st.session_state.api_key = new_key
-            st.success("API Key updated successfully.")
-            st.rerun()
-
