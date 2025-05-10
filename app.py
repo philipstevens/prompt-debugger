@@ -29,15 +29,15 @@ with st.expander("Settings"):
     # Model Selection
     model_choice = st.selectbox(
         "Model",
-        ["gpt-3.5-turbo (Faster, Cheaper)", "gpt-4-turbo (Higher Quality)", "gpt-4 (Highest Quality, Expensive)"],
-        index=0,
-        help="Choose the model used for running prompts and LLM similarity"
+        ["gpt-3.5-turbo", "o4-mini", "gpt-4o", "gpt-4.1"],
+        index=0,  # Default to cheapest to protect users
+        help="Choose the model to run the prompts and similarity comparison on"
     )
     
     # Similarity Method
     similarity_method = st.selectbox(
         "Similarity Method",
-        ["tfidf (Free, Fast)", "embeddings (Low Cost, High Quality)", "llm (High Cost, Highest Quality)"],
+        ["tfidf (Free, Fast)", "embeddings (Low Cost, High Quality)"],
         index=0,
         help="Choose how to compare output similarity"
     )
