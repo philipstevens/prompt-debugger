@@ -62,15 +62,23 @@ if st.button("Compare Prompts"):
 
         # Show Outputs
         st.subheader("Output")
-        st.write("**Prompt A Output:**")
-        st.code(out1)
-        st.write("**Prompt B Output:**")
-        st.code(out2)
+        col1, col2 = st.columns(2)
 
-        # Show Diff
-        st.subheader("Diff")
-        st.code(diff if diff else "No differences found.")
+        with col1:
+            st.markdown("**Prompt A Output:**")
+            st.text_area("Prompt A Output", out1, height=300, key="output_a", disabled=True)
+        
+        with col2:
+            st.markdown("**Prompt B Output:**")
+            st.text_area("Prompt B Output", out2, height=300, key="output_b", disabled=True)
+    
 
+        # Show Similarity
+        similarity = difflib.SequenceMatcher(None, out1, out2).ratio()
+        similarity_percentage = round(similarity * 100, 2)
+        st.subheader("Output Similarity Score")
+        st.markdown(f"**Similarity:** {similarity_percentage}%")
+        
         # Show Token and Cost Breakdown
         st.subheader("Token & Cost Info")
         st.markdown(f"""
