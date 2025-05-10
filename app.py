@@ -46,9 +46,6 @@ if st.button("Compare Prompts"):
         out1 = run_prompt(client, prompt1, model, max_tokens=max_tokens, temperature=temperature)
         out2 = run_prompt(client, prompt2, model, max_tokens=max_tokens, temperature=temperature)
 
-        # Compare outputs
-        diff = compare_outputs(out1, out2)
-
         # Token and cost info for input and output separately
         t1_input, c1_input = token_info(prompt1, model)
         t1_output, c1_output = token_info(out1, model)
@@ -72,7 +69,6 @@ if st.button("Compare Prompts"):
             st.markdown("**Prompt B Output:**")
             st.text_area("Prompt B Output", out2, height=300, key="output_b", disabled=True)
     
-
         # Show Similarity
         similarity_percentage, similarity_label = compare_text(out1, out2)
         st.subheader("Output Similarity")
