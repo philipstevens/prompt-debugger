@@ -31,6 +31,7 @@ def run_prompt(
     return response.choices[0].message.content
 
 def format_scaled_cost(cost):
+    print(f"DEBUG: formatting cost {cost}")
     if cost < 0.001:
         microdollars = cost * 1_000_000
         return f"{microdollars:.0f} µ$"
