@@ -42,12 +42,7 @@ model_choice = st.selectbox(
     index=0,
     help="Choose the model used for running prompts and LLM similarity"
 )
-st.write(f"DEBUG: Selected Model = {model_choice}")
 model = model_choice.split()[0]  # 'gpt-3.5-turbo', 'gpt-4-turbo', or 'gpt-4'
-
-# Tokens/Temperature
-max_tokens = st.slider("Max Tokens (response length)", min_value=1, max_value=1000, value=50)
-temperature = st.slider("Temperature (creativity/randomness)", min_value=0.0, max_value=1.0, value=0.0, step=0.05)
 
 # Similarity Method
 similarity_method = st.selectbox(
@@ -57,6 +52,11 @@ similarity_method = st.selectbox(
     help="Choose how to compare output similarity"
 )
 method_key = similarity_method.split()[0]  # 'tfidf', 'embeddings', or 'llm'
+
+# Tokens/Temperature
+max_tokens = st.slider("Max Tokens (response length)", min_value=1, max_value=1000, value=50)
+temperature = st.slider("Temperature (creativity/randomness)", min_value=0.0, max_value=1.0, value=0.0, step=0.05)
+
 
 if st.button("Compare Prompts"):
     client = create_client(st.session_state.api_key)
