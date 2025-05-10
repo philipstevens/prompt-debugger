@@ -1,5 +1,5 @@
 import streamlit as st
-from core import create_client, run_prompt, token_info, compare_similarity
+from core import create_client, run_prompt, token_info, compare_similarity, format_scaled_cost
 
 st.set_page_config(page_title="Prompt Debugger", page_icon="🛠️", layout="wide")
 
@@ -95,13 +95,13 @@ if st.button("Compare Prompts"):
         st.subheader("Token & Cost Info")
         st.markdown(f"""
         **Prompt A**
-        - Input: {t1_input} tokens (${c1_input:.4f})
-        - Output: {t1_output} tokens (${c1_output:.4f})
-        - Total: {t1_total_tokens} tokens (${c1_total_cost:.4f})
-
+        - Input: {t1_input} tokens ({format_scaled_cost(c1_input)})
+        - Output: {t1_output} tokens ({format_scaled_cost(c1_output)})
+        - Total: {t1_total_tokens} tokens ({format_scaled_cost(c1_total_cost)})
+        
         **Prompt B**
-        - Input: {t2_input} tokens (${c2_input:.4f})
-        - Output: {t2_output} tokens (${c2_output:.4f})
-        - Total: {t2_total_tokens} tokens (${c2_total_cost:.4f})
+        - Input: {t2_input} tokens ({format_scaled_cost(c2_input)})
+        - Output: {t2_output} tokens ({format_scaled_cost(c2_output)})
+        - Total: {t2_total_tokens} tokens ({format_scaled_cost(c2_total_cost)})
         """)
 
