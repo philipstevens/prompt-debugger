@@ -49,25 +49,6 @@ def token_info(text, model="gpt-3.5-turbo"):
 
     return tokens, cost
 
-# Function: Compare outputs
-def compare_text(text1, text2):
-    """Return similarity percentage and qualitative label."""
-    import difflib
-    similarity = difflib.SequenceMatcher(None, text1, text2).ratio()
-    percentage = round(similarity * 100, 2)
-
-    if percentage >= 90:
-        label = "Nearly Identical"
-    elif percentage >= 70:
-        label = "Very Similar"
-    elif percentage >= 50:
-        label = "Somewhat Similar"
-    elif percentage >= 30:
-        label = "Weak Similarity"
-    else:
-        label = "Very Different"
-
-    return percentage, label
 
 def get_embedding(text, client):
     return np.array(client.embeddings.create(model="text-embedding-ada-002", input=text).data[0].embedding)
@@ -108,21 +89,39 @@ def _similarity_llm(text1, text2, client, model="gpt-3.5-turbo"):
     except ValueError:
         return None
 
+def similarity_label(percentage):
+    """Return a qualitative label based on similarity percentage."""
+    if percentage >= 90:
+        return "Nearly Identical"
+    elif percentage >= 70:
+        return "Very Similar"
+    elif percentage >= 50:
+        return "Somewhat Similar"
+    elif percentage >= 30:
+        return "Weak Similarity"
+    else:
+        return "Very Different"
+
 def compare_similarity(text1, text2, method="tfidf", client=None):
     """
     Compare two texts using the selected similarity method.
     Supported methods: "tfidf", "embeddings", "llm"
+    Returns: (percentage, label)
     """
     if method == "tfidf":
-        return _similarity_tfidf(text1, text2)
+        percentage = _similarity_tfidf(text1, text2)
     elif method == "embeddings":
         if client is None:
             raise ValueError("Client is required for embedding similarity.")
-        return _similarity_embeddings(text1, text2, client)
+        percentage = _similarity_embeddings(text1, text2, client)
     elif method == "llm":
         if client is None:
             raise ValueError("Client is required for LLM similarity.")
-        return _similarity_llm(text1, text2, client)
+        percentage = _similarity_llm(text1, text2, client)
     else:
         raise ValueError(f"Unsupported method: {method}")
+
+    label = similarity_label(percentage)
+    return percentage, label
+
 
