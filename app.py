@@ -42,6 +42,7 @@ model_choice = st.selectbox(
     index=0,
     help="Choose the model used for running prompts and LLM similarity"
 )
+st.write(f"DEBUG: Selected Model = {model_choice}")
 model = model_choice.split()[0]  # 'gpt-3.5-turbo', 'gpt-4-turbo', or 'gpt-4'
 
 # Tokens/Temperature
