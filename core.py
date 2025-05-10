@@ -46,6 +46,22 @@ def token_info(text, model="gpt-3.5-turbo"):
     return tokens, cost
 
 # Function: Compare outputs
-def compare_outputs(out1, out2):
-    # Simulate a diff
-    return "\n".join(difflib.unified_diff(out1.splitlines(), out2.splitlines()))
+def compare_text(text1, text2):
+    """Return similarity percentage and qualitative label."""
+    import difflib
+    similarity = difflib.SequenceMatcher(None, text1, text2).ratio()
+    percentage = round(similarity * 100, 2)
+
+    if percentage >= 90:
+        label = "Nearly Identical"
+    elif percentage >= 70:
+        label = "Very Similar"
+    elif percentage >= 50:
+        label = "Somewhat Similar"
+    elif percentage >= 30:
+        label = "Weak Similarity"
+    else:
+        label = "Very Different"
+
+    return percentage, label
+
