@@ -1,5 +1,5 @@
 import streamlit as st
-from core import create_client, run_prompt, token_info, compare_text
+from core import create_client, run_prompt, token_info, compare_similarity
 
 st.set_page_config(page_title="Prompt Debugger", page_icon="🛠️", layout="wide")
 
@@ -24,8 +24,6 @@ if not st.session_state.key_confirmed:
             st.warning("Please enter your OpenAI API Key.")
     st.stop()
 
-model = "gpt-3.5-turbo"
-
 # Pre-filled example prompts
 example_prompt1 = "Explain the concept of gravity to a 10-year-old."
 example_prompt2 = "Describe gravity using a short analogy."
@@ -34,10 +32,30 @@ st.markdown("### Prompt Configuration")
 prompt1 = st.text_area("Prompt A", value=example_prompt1, height=150)
 prompt2 = st.text_area("Prompt B", value=example_prompt2, height=150)
 
-# Additional user controls
+# Additional Controls
 st.markdown("### Advanced Settings")
+
+# Model Selection
+model_choice = st.selectbox(
+    "Model",
+    ["gpt-3.5-turbo (Faster, Cheaper)", "gpt-4-turbo (Higher Quality)", "gpt-4 (Highest Quality, Expensive)"],
+    index=0,
+    help="Choose the model used for running prompts and LLM similarity"
+)
+model = model_choice.split()[0]  # 'gpt-3.5-turbo', 'gpt-4-turbo', or 'gpt-4'
+
+# Tokens/Temperature
 max_tokens = st.slider("Max Tokens (response length)", min_value=1, max_value=1000, value=50)
 temperature = st.slider("Temperature (creativity/randomness)", min_value=0.0, max_value=1.0, value=0.0, step=0.05)
+
+# Similarity Method
+similarity_method = st.selectbox(
+    "Similarity Method",
+    ["tfidf (Free, Fast)", "embeddings (Low Cost, High Quality)", "llm (High Cost, Highest Quality)"],
+    index=0,
+    help="Choose how to compare output similarity"
+)
+method_key = similarity_method.split()[0]  # 'tfidf', 'embeddings', or 'llm'
 
 if st.button("Compare Prompts"):
     client = create_client(st.session_state.api_key)
@@ -70,7 +88,7 @@ if st.button("Compare Prompts"):
             st.text_area("Prompt B Output", out2, height=300, key="output_b", disabled=True)
     
         # Show Similarity
-        similarity_percentage, similarity_label = compare_text(out1, out2)
+        similarity_percentage, similarity_label = compare_similarity(out1, out2, method=method_key, client=client)
         st.subheader("Similarity")
         st.markdown(f"{similarity_percentage}% ({similarity_label})")
         
