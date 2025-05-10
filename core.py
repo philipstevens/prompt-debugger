@@ -2,6 +2,10 @@ import openai
 import tiktoken
 import difflib
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+
 # Function: Create reusable OpenAI client
 def create_client(api_key):
     return openai.OpenAI(api_key=api_key)
@@ -64,4 +68,61 @@ def compare_text(text1, text2):
         label = "Very Different"
 
     return percentage, label
+
+def get_embedding(text, client):
+    return np.array(client.embeddings.create(model="text-embedding-ada-002", input=text).data[0].embedding)
+
+def _similarity_tfidf(text1, text2):
+    vectorizer = TfidfVectorizer()
+    vectors = vectorizer.fit_transform([text1, text2])
+    sim_score = cosine_similarity(vectors[0], vectors[1])[0][0]
+    return round(sim_score * 100, 2)
+
+def _similarity_embeddings(text1, text2, client):
+    emb1 = get_embedding(text1, client)
+    emb2 = get_embedding(text2, client)
+    cosine_sim = np.dot(emb1, emb2) / (np.linalg.norm(emb1) * np.linalg.norm(emb2))
+    return round(cosine_sim * 100, 2)
+
+def _similarity_llm(text1, text2, client, model="gpt-3.5-turbo"):
+    prompt = f"""
+    Rate the semantic similarity between these two texts on a scale of 0 to 100.
+    Consider meaning, tone, and style.
+    
+    Text 1:
+    {text1}
+    
+    Text 2:
+    {text2}
+    
+    Respond with only the number.
+    """
+    response = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=5,
+        temperature=0.0
+    )
+    try:
+        return float(response.choices[0].message.content.strip())
+    except ValueError:
+        return None
+
+def compare_similarity(text1, text2, method="tfidf", client=None):
+    """
+    Compare two texts using the selected similarity method.
+    Supported methods: "tfidf", "embeddings", "llm"
+    """
+    if method == "tfidf":
+        return _similarity_tfidf(text1, text2)
+    elif method == "embeddings":
+        if client is None:
+            raise ValueError("Client is required for embedding similarity.")
+        return _similarity_embeddings(text1, text2, client)
+    elif method == "llm":
+        if client is None:
+            raise ValueError("Client is required for LLM similarity.")
+        return _similarity_llm(text1, text2, client)
+    else:
+        raise ValueError(f"Unsupported method: {method}")
 
